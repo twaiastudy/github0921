@@ -5,8 +5,10 @@ const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
 const emptyState = document.getElementById('empty-state');
 const remainingCount = document.getElementById('remaining-count');
+const filterButtons = document.querySelectorAll('.filter-button');
 
 let todos = loadTodos();
+let currentFilter = 'all';
 
 // 從 localStorage 讀取待辦資料，若格式異常則回傳空陣列。
 function loadTodos() {
@@ -30,11 +32,43 @@ function createTodoId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// 依目前篩選條件取得要顯示的待辦事項。
+function getVisibleTodos() {
+  if (currentFilter === 'active') {
+    return todos.filter((todo) => !todo.completed);
+  }
+
+  if (currentFilter === 'completed') {
+    return todos.filter((todo) => todo.completed);
+  }
+
+  return todos;
+}
+
+// 當篩選結果為空時，提供清楚的提示文字。
+function getEmptyMessage() {
+  if (todos.length === 0) {
+    return '還沒有任何待辦事項,新增一個吧!';
+  }
+
+  if (currentFilter === 'active') {
+    return '目前沒有未完成的事項,切換到「全部」可查看其他項目。';
+  }
+
+  if (currentFilter === 'completed') {
+    return '目前沒有已完成的事項,切換到「全部」可查看還在清單中的項目。';
+  }
+
+  return '還沒有任何待辦事項,新增一個吧!';
+}
+
 // 根據目前資料重新繪製清單、空狀態與未完成數量。
 function renderTodos() {
+  const visibleTodos = getVisibleTodos();
+
   todoList.replaceChildren();
 
-  todos.forEach((todo) => {
+  visibleTodos.forEach((todo) => {
     const item = document.createElement('li');
     item.className = todo.completed ? 'todo-item is-completed' : 'todo-item';
     item.dataset.id = todo.id;
@@ -59,7 +93,8 @@ function renderTodos() {
     todoList.append(item);
   });
 
-  emptyState.hidden = todos.length > 0;
+  emptyState.hidden = visibleTodos.length > 0;
+  emptyState.textContent = getEmptyMessage();
 
   const unfinishedCount = todos.filter((todo) => !todo.completed).length;
   remainingCount.textContent = `未完成:${unfinishedCount} 項`;
@@ -107,6 +142,19 @@ function deleteTodo(todoId) {
   renderTodos();
 }
 
+// 切換清單篩選條件。
+function setFilter(filter) {
+  currentFilter = filter;
+
+  filterButtons.forEach((button) => {
+    const isActive = button.dataset.filter === filter;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+
+  renderTodos();
+}
+
 // 表單送出時新增待辦，並清空輸入框。
 todoForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -132,6 +180,13 @@ todoList.addEventListener('click', (event) => {
   if (event.target.matches('.delete-button')) {
     deleteTodo(todoId);
   }
+});
+
+// 按下篩選按鈕時，只顯示對應項目。
+filterButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setFilter(button.dataset.filter);
+  });
 });
 
 renderTodos();

@@ -116,6 +116,37 @@ body {
   transform: translateY(-1px);
 }
 
+.filter-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.filter-button {
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--text-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.filter-button:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.filter-button.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
 .empty-state {
   margin: 20px 0;
   padding: 18px;

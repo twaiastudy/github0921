@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'todo-list-items';
+const FILTER_STORAGE_KEY = 'todo-list-filter';
 
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
@@ -8,7 +9,7 @@ const remainingCount = document.getElementById('remaining-count');
 const filterButtons = document.querySelectorAll('.filter-button');
 
 let todos = loadTodos();
-let currentFilter = 'all';
+let currentFilter = loadFilter();
 
 // 從 localStorage 讀取待辦資料，若格式異常則回傳空陣列。
 function loadTodos() {
@@ -25,6 +26,22 @@ function loadTodos() {
 // 將目前清單寫回 localStorage，讓重新整理後仍可保留資料。
 function saveTodos() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+// 從 localStorage 讀取目前篩選條件，若值不合法就回退到「全部」。
+function loadFilter() {
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+
+  if (savedFilter === 'all' || savedFilter === 'active' || savedFilter === 'completed') {
+    return savedFilter;
+  }
+
+  return 'all';
+}
+
+// 將目前篩選條件寫回 localStorage。
+function saveFilter() {
+  localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
 }
 
 // 產生每一筆待辦的唯一識別碼。
@@ -145,6 +162,7 @@ function deleteTodo(todoId) {
 // 切換清單篩選條件。
 function setFilter(filter) {
   currentFilter = filter;
+  saveFilter();
 
   filterButtons.forEach((button) => {
     const isActive = button.dataset.filter === filter;
@@ -189,4 +207,5 @@ filterButtons.forEach((button) => {
   });
 });
 
-renderTodos();
+// 頁面載入時同步篩選按鈕狀態，並套用上次儲存的篩選條件。
+setFilter(currentFilter);

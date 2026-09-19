@@ -52,11 +52,11 @@ function getEmptyMessage() {
   }
 
   if (currentFilter === 'active') {
-    return '目前沒有未完成的事項,切換到「全部」可查看其他項目。';
+    return '目前沒有未完成的事項,這些項目只是被篩選掉,不是被刪除。切換到「全部」可再次查看。';
   }
 
   if (currentFilter === 'completed') {
-    return '目前沒有已完成的事項,切換到「全部」可查看還在清單中的項目。';
+    return '目前沒有已完成的事項,這些項目只是被篩選掉,不是被刪除。切換到「全部」可再次查看。';
   }
 
   return '還沒有任何待辦事項,新增一個吧!';
